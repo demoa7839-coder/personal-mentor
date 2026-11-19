@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>Personal Mentor</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101827;
+  color: #f4f6fb;
+  padding: 22px 16px;
+}
+
+header { margin-bottom: 25px; }
+
+.logo {
+  color: #91a9ff;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+h1 { margin: 10px 0 5px; font-size: 27px; }
+.subtitle { color: #9ba8bc; font-size: 14px; }
+
+.card {
+  background: #1b2638;
+  border: 1px solid #2c3a50;
+  border-radius: 15px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+h2 { font-size: 17px; margin-top: 0; }
+
+.welcome {
+  background: linear-gradient(135deg,#283e69,#29304e);
+}
+
+.welcome p { color: #d2dcf5; line-height: 1.6; }
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  color: #bdc8da;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+input, button {
+  width: 100%;
+  padding: 13px;
+  border-radius: 9px;
+  border: 1px solid #394a64;
+  margin-top: 9px;
+  font-size: 14px;
+}
+
+input {
+  background: #111c2d;
+  color: white;
+}
+
+button {
+  background: #718cff;
+  color: #101827;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.item {
+  padding: 12px;
+  background: #111c2d;
+  border-radius: 9px;
+  margin-top: 9px;
+  font-size: 14px;
+}
+
+.small { color: #9ba8bc; font-size: 12px; }
+
+footer {
+  text-align: center;
+  color: #77869e;
+  font-size: 12px;
+  padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">PERSONAL MENTOR</div>
+  <h1>Your personal learning space.</h1>
+  <div class="subtitle">A teacher who understands your day.</div>
+</header>
+
+<section class="card welcome">
+  <h2>Welcome, Student.</h2>
+  <p>
+    Your responsibilities matter.
+    Your education matters too.
+    Let's organise both, one day at a time.
+  </p>
+  <div class="stat">
+    <span>Today's progress</span>
+    <strong id="count">0 topics added</strong>
+  </div>
+</section>
+
+<section class="card">
+  <h2>My Syllabus</h2>
+  <p class="small">Add your subjects and chapters.</p>
+
+  <input id="subject" placeholder="Subject name">
+  <input id="chapter" placeholder="Chapter / Topic name">
+
+  <button onclick="addTopic()">+ Add to syllabus</button>
+
+  <div id="syllabus"></div>
+</section>
+
+<section class="card">
+  <h2>My Daily Responsibilities</h2>
+  <p class="small">
+    Add household work and other fixed commitments.
+  </p>
+
+  <input id="task" placeholder="Example: Household work">
+  <input id="time" placeholder="Time (Example: 08:00 AM)">
+
+  <button onclick="addTask()">+ Add responsibility</button>
+
+  <div id="tasks"></div>
+</section>
+
+<section class="card">
+  <h2>Mentor's Message</h2>
+  <p id="message">
+    First, let's understand your syllabus and daily routine.
+    A realistic schedule comes before a demanding one.
+  </p>
+  <button onclick="mentorMessage()">Talk to my mentor</button>
+</section>
+
+<footer>
+  PERSONAL MENTOR · Your journey, organised.
+</footer>
+
+<script>
+let topics = JSON.parse(
+  localStorage.getItem("pm_topics") || "[]"
+);
+
+let tasks = JSON.parse(
+  localStorage.getItem("pm_tasks") || "[]"
+);
+
+function save() {
+  localStorage.setItem("pm_topics", JSON.stringify(topics));
+  localStorage.setItem("pm_tasks", JSON.stringify(tasks));
+}
+
+function render() {
+  document.getElementById("syllabus").innerHTML =
+    topics.map((t,i) =>
+      `<div class="item">${t.subject} — ${t.chapter}
+      <button onclick="removeTopic(${i})">Remove</button></div>`
+    ).join("");
+
+  document.getElementById("tasks").innerHTML =
+    tasks.map((t,i) =>
+      `<div class="item">${t.name}
+      <div class="small">${t.time}</div>
+      <button onclick="removeTask(${i})">Remove</button></div>`
+    ).join("");
+
+  document.getElementById("count").textContent =
+    topics.length + " topics added";
+}
+
+function addTopic() {
+  let subject = document.getElementById("subject").value.trim();
+  let chapter = document.getElementById("chapter").value.trim();
+
+  if (!subject || !chapter) {
+    alert("Enter both subject and chapter.");
+    return;
+  }
+
+  topics.push({subject, chapter});
+  save();
+  render();
+
+  document.getElementById("subject").value = "";
+  document.getElementById("chapter").value = "";
+}
+
+function addTask() {
+  let name = document.getElementById("task").value.trim();
+  let time = document.getElementById("time").value.trim();
+
+  if (!name || !time) {
+    alert("Enter responsibility and time.");
+    return;
+  }
+
+  tasks.push({name,time});
+  save();
+  render();
+
+  document.getElementById("task").value = "";
+  document.getElementById("time").value = "";
+}
+
+function removeTopic(i) {
+  topics.splice(i,1);
+  save();
+  render();
+}
+
+function removeTask(i) {
+  tasks.splice(i,1);
+  save();
+  render();
+}
+
+function mentorMessage() {
+  document.getElementById("message").textContent =
+    "Good. We are building your foundation first. " +
+    "A schedule should fit your real responsibilities, " +
+    "not ignore them.";
+}
+
+render();
+</script>
+
+</body>
+</html>
